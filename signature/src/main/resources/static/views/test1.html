@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery.min.js"></script>
+    <style type="text/css">
+        *{margin: 0;padding: 0;}
+        #myCanvas{
+            border:1px solid #333;
+            display: block;
+            margin: 0 auto;
+        }
+        #operation{
+            width: 300px;
+            margin: 10px auto;
+        }
+        #position{
+            width: 100%;
+            text-align: center;
+            height: 30px;
+        }
+        #canvasImg{
+            display: block;
+            margin: 0 auto;
+            border: 1px dotted #333;
+        }
+    </style>
+
+</head>
+<body>
+<canvas id="myCanvas" width="300" height="200"></canvas>
+<div id="operation">
+    <p id="position"> </p>
+    <button id="clearCanvas">清空</button>
+    <button id="success">生成图片</button>
+</div>
+
+<img id="canvasImg" src="" alt="生成的图片" width="300" height="200">
+<script type="text/javascript">
+    var start_x,start_y,move_x,move_y,end_x,end_y;
+    var canvas=document.getElementById("myCanvas");
+    var ctx=canvas.getContext("2d");
+
+    var t=document.getElementById('myCanvas').offsetTop;//canvas上边距
+    var l=document.getElementById('myCanvas').offsetLeft;//canvas做边距
+    //按下
+    document.getElementById("myCanvas").addEventListener("touchstart",function(e){
+        start_x=e.touches[0].pageX-l;
+        start_y=e.touches[0].pageY-t;
+        //显示坐标
+        document.getElementById('position').innerText=('${start_x},${start_y}');
+    });
+    //移动
+    document.getElementById("myCanvas").addEventListener("touchmove",function(e){
+        move_x=e.touches[0].pageX-l;
+        move_y=e.touches[0].pageY-t;
+        //显示坐标
+        document.getElementById('position').innerText=('${move_x},${move_y}');
+    });
+    //松开
+    document.getElementById("myCanvas").addEventListener("touchend",function(e){
+        end_x=e.changedTouches[0].pageX-l;
+        end_y=e.changedTouches[0].pageY-t;
+        //显示坐标
+        document.getElementById('position').innerText=('${end_x},${end_y}');
+    });
+
+    document.getElementById('clearCanvas').onclick=function(){
+        // 清空画布
+        ctx.clearRect(0,0,300,200);
+    }
+
+    document.getElementById('success').onclick=function(){
+        // canvas生成图片base64编码
+        console.log(canvas.toDataURL("image/png"))
+        //将生成的图片赋给img元素
+        document.getElementById('canvasImg').src=this.canvas.toDataURL("image/png")
+    }
+
+</script>
+</body>
+</html>

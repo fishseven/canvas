@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery-ui-1.10.4.min.js"></script>
+    <script src="../js/plugins/jSignature/canvas2image.js"></script>
+    <script src="../js/html2canvas.js"></script>
+    <!--<script src="../js/plugins/jSignature/jSignature.min.js"></script>-->
+    <!--<script src="../js/plugins/jSignature/flashcanvas.js"></script>-->
+    <!--<script src="../js/plugins/jSignature/jSignature.min.noconflict.js"></script>-->
+    <style type="text/css">
+        html,body{
+
+            overflow: hidden;
+        }
+        #canvas{
+
+            position: relative;
+        }
+        #canvas canvas{
+            display: block;
+        }
+        #clearCanvas{
+            width: 50%;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border: 1px solid #DEDEDE;
+            z-index: 1;
+        }
+        #saveCanvas{
+            width: 50%;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border: 1px solid #DEDEDE;
+            z-index: 1;
+
+        }
+        #canvasImg{
+            display: block;
+            margin: 0 auto;
+            border: 1px dotted #333;
+        }
+
+    </style>
+</head>
+<body tabindex="1" class="loadingInProgress" id="contbox">
+<!--<div class="btn" id="btn">截取屏幕</div>-->
+<div id="test"><a id="down1" class="down" href="" download="downImg"><span></span></a></div>
+<div id="canvas">
+    <div>hello fish!</div>
+
+</div>
+    <p id="clearCanvas">清除</p>
+    <p id="saveCanvas">保存</p>
+<!--<img id="canvasImg" src="" alt="生成的图片" width="300" height="200">-->
+<a id="tttt"></a>
+<script type="text/javascript">
+    window.onload = function() {
+        new lineCanvas({
+            el: document.getElementById("canvas"),//绘制canvas的父级div
+            clearEl: document.getElementById("clearCanvas"),//清除按钮
+            saveEl: document.getElementById("saveCanvas"),//保存按钮
+            //      linewidth:1,//线条粗细，选填
+            //      color:"black",//线条颜色，选填
+            //      background:"#ffffff"//线条背景，选填
+        });
+    };
+    function lineCanvas(obj) {
+        this.linewidth = 1;
+        this.color = "#000000";
+        this.background = "#ffffff";
+        for (var i in obj) {
+            this[i] = obj[i];
+        };
+        this.canvas = document.createElement("canvas");
+        this.el.appendChild(this.canvas);
+        this.cxt = this.canvas.getContext("2d");
+        this.canvas.width = 500;
+        this.canvas.height = 400;
+        this.cxt.fillStyle = this.background;
+        this.cxt.fillRect(0, 0, this.canvas.width, this.canvas.width);
+        this.cxt.strokeStyle = this.color;
+        this.cxt.lineWidth = this.linewidth;
+        this.cxt.lineCap = "round";
+        //开始绘制
+        this.canvas.addEventListener("touchstart", function(e) {
+            this.cxt.beginPath();
+            this.cxt.moveTo(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+        }.bind(this), false);
+        //绘制中
+        this.canvas.addEventListener("touchmove", function(e) {
+            console.log(11);
+            this.cxt.lineTo(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+            this.cxt.stroke();
+        }.bind(this), false);
+        //结束绘制
+        this.canvas.addEventListener("touchend", function() {
+            this.cxt.closePath();
+        }.bind(this), false);
+        //清除画布
+        this.clearEl.addEventListener("click", function() {
+            this.cxt.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }.bind(this), false);
+        //保存图片，直接转base64
+        this.saveEl.addEventListener("click", function() {
+            // var imgBase64 = this.canvas.toDataURL();
+            // console.log(imgBase64);
+            // alert(imgBase64)
+            // //将生成的图片赋给img元素
+            this.canvas.toDataURL("image/png");
+            console.log(this.canvas.toDataURL("image/png"));
+           // document.getElementById('canvasImg').src=this.canvas.toDataURL("image/png")
+           //  var sampleImage = document.getElementById("canvasImg"),
+           //      canvas = convertImageToCanvas(sampleImage);
+            url = this.canvas.toDataURL("image/png");//PNG格式
+            //以下代码为下载此图片功能
+            // var triggerDownload = $("#tttt").attr("href", url).attr("download", "test.png");
+            // triggerDownload[0].click();
+            html2canvas($("#contbox"), {
+                height: $("#contbox").outerHeight() + 20,
+                width: $("#contbox").outerWidth() + 20  ,
+                onrendered: function(canvas) {
+                    //将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
+                    var timestamp = Date.parse(new Date());
+                    //把截取到的图片替换到a标签的路径下载
+                    // console.log(canvas.toDataURL())
+                    $("#down1").attr('href',canvas.toDataURL());
+                    //下载下来的图片名字
+                    $("#down1").attr('download',timestamp + '.png') ;
+                    $("a span").trigger('click');
+
+                    //document.body.appendChild(canvas);
+                }
+                //可以带上宽高截取你所需要的部分内容
+            });
+// here is the most important part because if you dont replace you will get a DOM 18 exception.
+// var image = myCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream;Content-Disposition: attachment;filename=foobar.png");
+//            var image = this.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+//             window.location.href = image; // it will save locally
+//             Canvas2Image.saveAsPNG(this.canvas,true)
+
+//             var saveFile = function(data, filename){
+//                 var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+//                 save_link.href = data;
+//                 save_link.download = filename;
+//
+//                 var event = document.createEvent('MouseEvents');
+//                 event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+//                 save_link.dispatchEvent(event);
+//             };
+//
+// // 下载后的问题名
+//             var filename = 'baidufe_' + (new Date()).getTime() + '.' + 'png';
+//             var imgData = this.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+// // download
+//             alert(filename);
+//             saveFile(imgData,filename);
+
+        }.bind(this), false);
+    };
+    /**
+     * 根据图片生成画布
+     */
+    // function convertImageToCanvas(image) {
+    //     var canvas = document.createElement("canvas");
+    //     canvas.width = image.width;
+    //     canvas.height = image.height;
+    //     canvas.getContext("2d").drawImage(image, 0, 0);
+    //     return canvas;
+    // }
+//以下是截图代码
+    $(function(){
+        $("#btn").click(function(){
+            html2canvas($("#contbox"), {
+                height: $("#contbox").outerHeight() + 20,
+                width: $("#contbox").outerWidth() + 20  ,
+                onrendered: function(canvas) {
+                    //将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
+                    var timestamp = Date.parse(new Date());
+                    //把截取到的图片替换到a标签的路径下载
+                    console.log(canvas.toDataURL())
+                    $("#down1").attr('href',canvas.toDataURL());
+                    //下载下来的图片名字
+                    $("#down1").attr('download',timestamp + '.png') ;
+                    //document.body.appendChild(canvas);
+                }
+                //可以带上宽高截取你所需要的部分内容
+            });
+        });
+    });
+</script>
+</body>
+</html>

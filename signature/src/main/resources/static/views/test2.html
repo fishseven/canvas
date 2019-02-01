@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>签名画板</title>
+    <style>
+        *{ padding:0; margin:0;}
+        body{ background:#ccc;}
+        canvas{ background:#fff; margin:50px 10px;}
+    </style>
+</head>
+<body>
+<h1 align="center" style="color:red">只支持移动端,不支持PC端</h1>
+    <div style="text-align: center">
+        <canvas height="600" width="900"  id="canvas">
+            <span>亲，您的浏览器不支持canvas，换个浏览器试试吧！</span>
+        </canvas>
+    </div>
+    </div>
+    <h1 align="center" style="color:red">只支持移动端,不支持PC端</h1>
+        <script>
+
+            window.onload = function(){
+                var canvas = document.getElementById("canvas");
+                var ctx = canvas.getContext("2d");
+                ctx.lineWidth = 6.0;
+                canvas.addEventListener('touchstart',function(event){//触摸点按下事件
+                    if (event.targetTouches.length == 1) {
+                        var touch = event.targetTouches[0];
+                        ctx.beginPath();
+                        ctx.moveTo(touch.clientX-canvas.offsetLeft,touch.clientY-canvas.offsetTop);
+                        canvas.addEventListener('touchmove',function (event) {//手机拖动触摸点事件
+                            var touche = event.targetTouches[0];
+                            ctx.lineTo(touche.clientX - canvas.offsetLeft, touche.clientY - canvas.offsetTop);
+                            ctx.stroke();
+                        },false)
+                        canvas.addEventListener('touchend',function (event) {//手机离开屏幕的事件
+                            ctx.closePath();
+
+                        },false)
+
+                    }
+                },false)
+
+            }
+        </script>
+</body>
+</html>
